@@ -11,3 +11,68 @@
 
 
 
+### Exercise 2 - Code analysis
+For each provided code snippet, analyze and document what it should do.
+
+#### Snippet 1
+- Without testing it, what is wrong with this code snippet?
+    - The vector is not mutable, so the push method is not allowed.
+- How can it be fixed?
+    - Make the vector mutable.
+```rust
+fn main() {
+    let a = vec![1,2,3,4];
+    a.push(27);
+}
+```
+
+#### Snippet 2
+- Without testing it, what is wrong with this code snippet?
+    - The function parameter `a` is not mutable, so the += operator is not allowed.
+- How can it be fixed?
+    - Make the function parameter `a` mutable.
+
+```rust
+fn my_operation(a: u64, b: u64) -> u64 {
+    a += b;
+    a
+}
+
+
+fn main() {
+    let num1 = 1234;
+    let num2 = 1122;
+    println!("My result is {}!", my_operation(num1, num2));
+}
+```
+
+
+#### Snippet 3
+
+Without executing the code, what is the printed value of x?
+Test it and explain why x has this value.
+- The printed value of x is 3. The mutable x in the inner scope has its value changed to 3, and the non-mutable x is dropped.
+```rust
+fn main() {
+    let x = 1;
+
+    {
+        let mut x = 2;
+
+        x = x ^ 2;
+
+        {
+            x = 3;
+            let x = 12;
+        }
+        println!("x is: {}", x);
+    }
+}
+```
+
+
+#### Snippet 4
+    
+- The following Solidity and Rust snippets shows the (Key ⇒ Value) functionality. Solidity provides this through a mapping while Rust provides it through an Hashmap.  
+    - What is the main difference between the two languages about non-initialized data?
+        - Rust's HashMap explicitly indicates the absence of a key through the Option::None variant.
