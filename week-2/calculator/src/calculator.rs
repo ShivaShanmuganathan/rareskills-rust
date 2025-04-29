@@ -1,45 +1,54 @@
 use std::fmt;
+use std::ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Sub};
 
-// Debug can be auto-generated
+// Generic Calculator struct
 #[derive(Debug)]
-pub struct Calculator {
-    pub x: i32,
-    pub y: i32,
+pub struct Calculator<T> {
+    pub x: T,
+    pub y: T,
 }
 
-trait AdditiveOperations {
-    fn add(&self) -> i32;
-    fn sub(&self) -> i32;
+// Generic traits
+pub trait AdditiveOperations<T> {
+    fn add(&self) -> T;
+    fn sub(&self) -> T;
 }
 
-trait MultiplicativeOperations {
-    fn mul(&self) -> i32;
-    fn div(&self) -> Option<i32>;
+pub trait MultiplicativeOperations<T> {
+    fn mul(&self) -> T;
+    fn div(&self) -> Option<T>;
 }
 
-trait BinaryOperations {
-    fn and(&self) -> i32;
-    fn or(&self) -> i32;
-    fn xor(&self) -> i32;
+pub trait BinaryOperations<T> {
+    fn and(&self) -> T;
+    fn or(&self) -> T;
+    fn xor(&self) -> T;
 }
 
-impl AdditiveOperations for Calculator {
-    fn add(&self) -> i32 {
+// Implement traits for Calculator<T>
+impl<T> AdditiveOperations<T> for Calculator<T>
+where
+    T: Copy + Add<Output = T> + Sub<Output = T>,
+{
+    fn add(&self) -> T {
         self.x + self.y
     }
 
-    fn sub(&self) -> i32 {
+    fn sub(&self) -> T {
         self.x - self.y
     }
 }
 
-impl MultiplicativeOperations for Calculator {
-    fn mul(&self) -> i32 {
+impl<T> MultiplicativeOperations<T> for Calculator<T>
+where
+    T: Copy + Mul<Output = T> + Div<Output = T> + PartialEq + From<u8>,
+{
+    fn mul(&self) -> T {
         self.x * self.y
     }
 
-    fn div(&self) -> Option<i32> {
-        if self.y == 0 {
+    fn div(&self) -> Option<T> {
+        if self.y == T::from(0u8) {
             None
         } else {
             Some(self.x / self.y)
@@ -47,21 +56,39 @@ impl MultiplicativeOperations for Calculator {
     }
 }
 
-impl BinaryOperations for Calculator {
-    fn and(&self) -> i32 {
+// Implement Binary Operations only for integer-like types
+impl<T> BinaryOperations<T> for Calculator<T>
+where
+    T: Copy + BitAnd<Output = T> + BitOr<Output = T> + BitXor<Output = T>,
+{
+    fn and(&self) -> T {
         self.x & self.y
     }
 
-    fn or(&self) -> i32 {
+    fn or(&self) -> T {
         self.x | self.y
     }
 
-    fn xor(&self) -> i32 {
+    fn xor(&self) -> T {
         self.x ^ self.y
     }
 }
 
-impl fmt::Display for Calculator {
+// Display for Calculator
+impl<T> fmt::Display for Calculator<T>
+where
+    T: fmt::Display
+        + Copy
+        + Add<Output = T>
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Div<Output = T>
+        + PartialEq
+        + From<u8>
+        + BitAnd<Output = T>
+        + BitOr<Output = T>
+        + BitXor<Output = T>,
+{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let div_result = self
             .div()
@@ -80,7 +107,20 @@ impl fmt::Display for Calculator {
     }
 }
 
-// fn main() {
-//     let calculator = Calculator { x: 1, y: 2 };
-//     println!("calculator:\n{}", calculator);
-// }
+// New function to print all operations
+pub fn print_output<T>(input: &Calculator<T>)
+where
+    T: fmt::Display
+        + Copy
+        + Add<Output = T>
+        + Sub<Output = T>
+        + Mul<Output = T>
+        + Div<Output = T>
+        + PartialEq
+        + From<u8>
+        + BitAnd<Output = T>
+        + BitOr<Output = T>
+        + BitXor<Output = T>,
+{
+    println!("{}", input);
+}
