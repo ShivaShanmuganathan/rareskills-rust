@@ -107,7 +107,7 @@ where
     }
 }
 
-// New function to print all operations
+// Print all operations
 pub fn print_output<T>(input: &Calculator<T>)
 where
     T: fmt::Display

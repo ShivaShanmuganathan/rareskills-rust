@@ -139,7 +139,7 @@ mod tests {
         contract.add_message("2nd message".to_string());
         contract.add_message("3rd message".to_string());
 
-        let total = &contract.total_messages(); // why are we using & here?
+        let total = &contract.total_messages(); // why are we using & to borrow here?
         assert!(*total == 3);
 
         let last_message = &contract.get_messages(Some(U64::from(1)), Some(U64::from(2)))[1];
@@ -170,6 +170,20 @@ Expected outputs:
 - Users can later withdraw by redeeming shares for the underlying token amount.
 - The vault tracks total deposits and each user’s balance using internal mappings.
 - It interacts with an external ERC-20 token via the IERC20 interface, using transfer_from to pull tokens in and transfer to pay tokens back on withdrawal.
+
+
+| Element              | Meaning                                       |
+|----------------------|-----------------------------------------------|
+| `<TContractState>`   | A generic placeholder for contract state      |
+| `self: @TContractState` | Read-only access to that contract’s state |
+| `ref self: TContractState` | Mutable access to the state            |
+
+Why are we using `felt252` here?
+- The native data type in Cairo is a felt252 = a field element up to 252 bits
+- All arithmetic (add, mul, etc.) is done inside this field
+- It’s circuit-friendly and ideal for zero-knowledge proofs
+
+
 
 ### In-depth analysis
 
