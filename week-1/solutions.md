@@ -76,3 +76,24 @@ fn main() {
 - The following Solidity and Rust snippets shows the (Key ⇒ Value) functionality. Solidity provides this through a mapping while Rust provides it through an Hashmap.  
     - What is the main difference between the two languages about non-initialized data?
         - Rust's HashMap explicitly indicates the absence of a key through the Option::None variant.
+
+
+### Exercise 3 - Security analysis
+
+The user deposits collateral and receives a proportional number of share tokens based on the current exchange rate.
+
+```rust
+pub fn deposit(ctx: Context<Deposit>, collat: u64) -> Result<()> {
+    let rate = exchange_rate.deposit_rate as u128;
+    let amt = (collat as u128 * rate / DECIMALS_SCALAR) as u64; 
+
+    token::transfer(collateral_token, ctx.caller, ctx.this, collat)?;
+    token::mint_to(shares_token, ctx.caller, amt)?;
+
+    Ok(())
+}
+```
+
+
+
+If the final result exceeds u64::MAX, the cast to u64 will truncate it → wrong amount minted (likely too low).
