@@ -1,7 +1,11 @@
-depth = 100  # Start low and increase until crash
-obj = '"boom"'
+depth = 20
+repeat = 500  # how many entries to add
+entry = '"boom"'
 for _ in range(depth):
-    obj = '{"a":' + obj + '}'
+    entry = '{"a":' + entry + '}'
 
-with open("nested.json", "w") as f:
-    f.write(obj)
+with open("recursive_map.json", "w") as f:
+    f.write('{')
+    for i in range(repeat):
+        f.write(f'"entry_{i}": {entry},')
+    f.write('"done": "ok"}')  # end properly
