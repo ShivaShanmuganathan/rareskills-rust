@@ -1,5 +1,41 @@
 # Week 3 Solutions
 
+## Vulnerable NFT Soroban
+
+### 🔍 Potential Issues & Security Concerns
+
+❗️1. Use of temporary() storage for admin
+Problem :
+Temporary storage in Soroban has a TTL and can expire unexpectedly.
+
+If TTL expires, the admin value will be deleted automatically by the Soroban runtime.
+
+Consequence:
+Admin access may vanish unless TTL is explicitly extended (which this contract does not do).
+
+Could lead to a permanently locked contract with no admin controls.
+
+❗️2. No access control on write_administrator
+Problem:
+Any caller can invoke write_administrator(...)
+
+There's no check to ensure that only an existing admin can overwrite it
+
+Consequence:
+Admin privileges are open to any caller, leading to admin takeover
+
+❗️3. No TTL extension
+Even though it's using .temporary(), there's no call to .extend_ttl(). That means:
+
+The admin entry might live for only a few ledgers (e.g. 1–30 seconds)
+
+After expiration, read_administrator will return Error::NotFound
+
+
+
+
+
+
 ## Vulnerable HTTP Server
 
 How to crash the server:
