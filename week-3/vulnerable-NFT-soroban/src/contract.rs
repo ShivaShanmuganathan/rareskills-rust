@@ -56,12 +56,15 @@ impl NFTokenTrait for NFToken {
 
         let id = read_supply(&env);
         write_owner(&env, id, Some(to.clone()));
+        // @audit-issue - Minting without a supply cap. What if the supply goes beyond i128?
         increment_supply(&env);
 
         event::mint(&env, to, id)
     }
 
     // @audit-issue - There is no access control on burn to ensure only the owner can burn the token?
+    // @audit-info - Should take the owner arg and check it against the stored owner
+    // @audit-issue - Should check owner.require_auth()
     fn burn(env: Env, id: i128) {
         env.storage()
             .instance()
@@ -70,7 +73,6 @@ impl NFTokenTrait for NFToken {
         let from = read_owner(&env, id);
         // @audit-issue - check_owner is missing here
         write_owner(&env, id, None);
-
         event::burn(&env, from, id);
     }
 
@@ -140,8 +142,10 @@ impl NFTokenTrait for NFToken {
         check_owner(&env, &from, id);
         // @audit-info - What exactly does require_auth do here?
         // I think this might be equivalent to 'msg.sender == from'
+        // @audit-issue - Approval not cleared when transferring
         from.require_auth();
         write_owner(&env, id, Some(to.clone()));
+
         event::transfer(&env, from, to, id);
     }
 
@@ -150,8 +154,9 @@ impl NFTokenTrait for NFToken {
             .instance()
             .extend_ttl(INSTANCE_LIFETIME_THRESHOLD, INSTANCE_BUMP_AMOUNT);
         check_owner(&env, &from, id);
-        spender.require_auth(); // 'msg.sender == spender'
-
+        // 'msg.sender == spender'
+        spender.require_auth();
+        // @audit-issue - Approval not cleared when transferring
         if read_approval_all(&env, from.clone(), spender.clone())
             || spender == read_approval(&env, id)
         {
